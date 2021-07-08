@@ -114,6 +114,6 @@ class BookingDialogDetailsMiddleWare(aiounittest.AsyncTestCase):
             "\nfrom paris on 2021-03-23."
             "\nYour flight back is schedules on 2021-04-15."
             "\nYou want to spend less than: $ 500."
-            " (1) Yes or (2) No"
+            " (1) Yes or (2) Noxxx"
         )
         assert reply.text == message
