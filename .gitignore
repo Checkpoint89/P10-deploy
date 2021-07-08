@@ -1,0 +1,15 @@
+FlightBookingBot.bot
+FlightBookingBotOnAzure.bot
+settings.cmd
+env.yml
+setup.py
+test.ipynb
+testjj.py
+ngrok.exe
+deploymentTemplates
+azbot*
+__pycache__
+.pylintrc
+.git
+.pytest_cache
+.vscode
