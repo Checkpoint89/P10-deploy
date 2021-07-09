@@ -4,6 +4,7 @@
 from typing import List
 
 
+
 class BookingDetails:
     def __init__(
         self,

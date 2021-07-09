@@ -1,12 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+from botbuilder.core.conversation_state import ConversationState
 from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext, DialogTurnResult
 from botbuilder.dialogs.prompts import ConfirmPrompt, TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory, UserState, BotTelemetryClient, NullTelemetryClient
 from botbuilder.schema import InputHints
 
 from datatypes_date_time.timex import Timex
+
+from data_model import ConState
 
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
@@ -18,6 +21,7 @@ class BookingDialog(CancelAndHelpDialog):
         self,
         dialog_id: str = None,
         user_state: UserState = None,
+        con_state: ConversationState = None,
         telemetry_client: BotTelemetryClient = NullTelemetryClient):
         super(BookingDialog, self).__init__(
             dialog_id or BookingDialog.__name__,
@@ -28,9 +32,14 @@ class BookingDialog(CancelAndHelpDialog):
 
         if user_state is None:
             raise Exception("[BookingDialogBot]: Missing parameter. user_state is required")
+        if con_state is None:
+            raise Exception("[BookingDialogBot]: Missing parameter. con_state is required")
 
         self.user_state = user_state
         self.user_prop = self.user_state.create_property("user_state")
+
+        self.con_state = con_state
+        self.con_prop = self.con_state.create_property("con_state")
 
         text_prompt = TextPrompt(TextPrompt.__name__)
         text_prompt.telemetry_client = telemetry_client
@@ -69,6 +78,7 @@ class BookingDialog(CancelAndHelpDialog):
         :param step_context:
         :return DialogTurnResult:
         """
+
         booking_details = step_context.options
 
         if booking_details.destination is None:
@@ -218,12 +228,14 @@ class BookingDialog(CancelAndHelpDialog):
         :param step_context:
         :return DialogTurnResult:
         """
+
         if step_context.result:
             booking_details = step_context.options
-            self.telemetry_client.track_trace("Failed")
+            self.telemetry_client.track_trace("Success")
             return await step_context.end_dialog(booking_details)
 
-        self.telemetry_client.track_trace("Success")
+        self.telemetry_client.track_trace("Failed")
+        step_context.context.turn_state['failed'] = True
         return await step_context.end_dialog()
 
 

@@ -22,6 +22,7 @@ from flight_booking_recognizer import FlightBookingRecognizer
 from helpers import LuisHelper, Intent
 from .booking_dialog import BookingDialog
 
+from config import MIN_INTENT_SCORE
 
 class MainDialog(ComponentDialog):
     def __init__(
@@ -90,11 +91,11 @@ class MainDialog(ComponentDialog):
 
         # Call LUIS and gather any potential booking details.
         # (Note the TurnContext has the response to the prompt.)
-        intent, luis_result = await LuisHelper.execute_luis_query(
+        intent, score, luis_result = await LuisHelper.execute_luis_query(
             self._luis_recognizer, step_context.context
         )
 
-        if intent == Intent.BOOK_FLIGHT.value and luis_result:
+        if intent == Intent.BOOK_FLIGHT.value and luis_result and score > MIN_INTENT_SCORE:
             # Show a warning for Origin and Destination if we can't resolve them.
             await MainDialog._show_warning_for_unsupported_cities(
                 step_context.context, luis_result
@@ -102,8 +103,6 @@ class MainDialog(ComponentDialog):
 
 
             # Run the BookingDialog giving it whatever details we have from the LUIS call.
-            print(f"\n-------------[main_dialog.py] intent: {intent}-------------")
-            print(f"\n-------------[main_dialog.py] luis_result: {vars(luis_result)}-------------")
             return await step_context.begin_dialog(self._booking_dialog_id, luis_result)
 
         if intent == Intent.GET_WEATHER.value:

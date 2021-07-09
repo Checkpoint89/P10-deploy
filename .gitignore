@@ -1,5 +1,6 @@
 FlightBookingBot.bot
 FlightBookingBotOnAzure.bot
+BookingFlightBotLocal.bot
 corebot.bot
 settings.cmd
 env.yml

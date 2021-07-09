@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Dict
 from recognizers_date_time import recognize_datetime
 from botbuilder.ai.luis import LuisRecognizer
-from botbuilder.core import IntentScore, TopIntent, TurnContext
+from botbuilder.core import IntentScore, TopIntent, TurnContext, intent_score
 
 from booking_details import BookingDetails
 
@@ -32,13 +32,13 @@ class LuisHelper:
     @staticmethod
     async def execute_luis_query(
         luis_recognizer: LuisRecognizer, turn_context: TurnContext
-    ) -> (Intent, object):
+    ) -> (Intent, object, object):
         """
         Returns an object with pre-formatted LUIS results for the bot's dialogs to consume.
         """
         result = None
         intent = None
-
+        score = None
 
 
         def get_entities(luis_result, entities):
@@ -66,28 +66,25 @@ class LuisHelper:
         try:
             recognizer_result = await luis_recognizer.recognize(turn_context)
             
-            intent = (
-                sorted(
-                    recognizer_result.intents,
-                    key=recognizer_result.intents.get,
-                    reverse=True,
-                )[:1][0]
-                if recognizer_result.intents
-                else None
-            )
+            if recognizer_result.intents:
+                intent = sorted(recognizer_result.intents,key=recognizer_result.intents.get,reverse=True,)[:1][0]
+                score = recognizer_result.intents.get(intent).score
+            else:
+                intent =  None
+                score = None
 
-            # if intent == Intent.BOOK_FLIGHT.value:
             result = BookingDetails()
             get_entities(recognizer_result, result)
 
-                
         except Exception as err:
             print(err)
 
         try:
+            print(f"\n-------------[luis_helper.py] text: {turn_context.activity.text}----")
+            print(f"\n-------------[luis_helper.py] intent: {intent} score: {score}----")
             print(f"\n-------------[luis_helper.py] result: {vars(result)}-------------")
         except TypeError as err:
             print(f"\n-------------[luis_helper.py] result: {err}-------------")
 
-        return intent, result
+        return intent, score, result
 

@@ -4,6 +4,8 @@
 
 import os
 
+MIN_INTENT_SCORE = 0.5
+
 class DefaultConfig:
     """ Bot Configuration """
 
@@ -15,6 +17,11 @@ class DefaultConfig:
     LUIS_API_KEY = os.getenv("PREDICTION_KEY")
     LUIS_API_HOST_NAME = os.getenv("PREDICTION_ENDPOINT")
     APPINSIGHTS_INSTRUMENTATION_KEY = os.getenv("APPINSIGHTS_INSTRUMENTATION_KEY")
+    DB_ENDPOINT = os.getenv("DB_ENDPOINT")
+    DB_KEY = os.getenv("DB_KEY")
+    DB_NAME = os.getenv("DB_NAME")
+    DB_CONTAINER_NAME = os.getenv("DB_CONTAINER_NAME")
+
 
     # print("APP_ID",APP_ID)
     # print("APP_PASSWORD",APP_PASSWORD)

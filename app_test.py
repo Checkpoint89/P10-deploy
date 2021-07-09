@@ -1,5 +1,4 @@
 import aiounittest
-import asyncio
 
 from botbuilder.core import (
     ConversationState,
@@ -7,6 +6,7 @@ from botbuilder.core import (
     MemoryStorage,
 )
 
+from botbuilder.azure import CosmosDbConfig, CosmosDbStorage
 from botbuilder.core.adapters import TestAdapter
 from botbuilder.testing.dialog_test_client import DialogTestClient
 
@@ -25,9 +25,14 @@ MEMORY = MemoryStorage()
 USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 
+COMOS_DB_CONFIG = CosmosDbConfig(
+    CONFIG.DB_ENDPOINT,CONFIG.DB_KEY,
+    CONFIG.DB_NAME, CONFIG.DB_CONTAINER_NAME)
+COSMOS_DB_STORAGE = CosmosDbStorage(COMOS_DB_CONFIG)
+
 # Create dialogs and Bot
 RECOGNIZER = FlightBookingRecognizer(CONFIG)
-BOOKING_DIALOG = BookingDialog(user_state=USER_STATE)
+BOOKING_DIALOG = BookingDialog(user_state=USER_STATE, con_state=CONVERSATION_STATE)
 DIALOG = MainDialog(RECOGNIZER, BOOKING_DIALOG)
 BOT = ValidationBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
