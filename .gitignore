@@ -15,3 +15,7 @@ __pycache__
 .git
 .pytest_cache
 .vscode
+
+data
+P10_00_presentation*
+P10_03_performance_monitoring*
