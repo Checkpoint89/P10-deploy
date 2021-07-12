@@ -49,15 +49,6 @@ COMOS_DB_CONFIG = CosmosDbConfig(
     CONFIG.DB_NAME, CONFIG.DB_CONTAINER_NAME)
 COSMOS_DB_STORAGE = CosmosDbStorage(COMOS_DB_CONFIG)
 
-# Create adapter.
-# See https://aka.ms/about-bot-adapter to learn more about how bots work.
-SETTINGS = BotFrameworkAdapterSettings(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
-SETTINGS = BotFrameworkAdapterSettings(None, None)
-ADAPTER = AdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
-luis_recognizer = FlightBookingRecognizer(CONFIG)
-
-ADAPTER.use(Middleware1(luis_recognizer))
-ADAPTER.use(Middleware2(CONVERSATION_STATE, COSMOS_DB_STORAGE))
 
 # Create telemetry client.
 # Note the small 'client_queue_size'.  This is for demonstration purposes.  Larger queue sizes
@@ -68,9 +59,23 @@ TELEMETRY_CLIENT = ApplicationInsightsTelemetryClient(
     INSTRUMENTATION_KEY, telemetry_processor=AiohttpTelemetryProcessor(), client_queue_size=10
 )
 
+# Create adapter.
+# See https://aka.ms/about-bot-adapter to learn more about how bots work.
+SETTINGS = BotFrameworkAdapterSettings(CONFIG.APP_ID, CONFIG.APP_PASSWORD)
+SETTINGS = BotFrameworkAdapterSettings(None, None)
+ADAPTER = AdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
+luis_recognizer = FlightBookingRecognizer(CONFIG, TELEMETRY_CLIENT)
+
+ADAPTER.use(Middleware1(luis_recognizer))
+ADAPTER.use(Middleware2(CONVERSATION_STATE, COSMOS_DB_STORAGE))
+
 # Create dialogs and Bot
-RECOGNIZER = FlightBookingRecognizer(CONFIG)
-BOOKING_DIALOG = BookingDialog(user_state=USER_STATE, con_state=CONVERSATION_STATE)
+RECOGNIZER = FlightBookingRecognizer(CONFIG, telemetry_client=TELEMETRY_CLIENT)
+BOOKING_DIALOG = BookingDialog(
+    user_state=USER_STATE,
+    con_state=CONVERSATION_STATE,
+    telemetry_client=TELEMETRY_CLIENT
+    )
 DIALOG = MainDialog(RECOGNIZER, BOOKING_DIALOG, telemetry_client=TELEMETRY_CLIENT)
 BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG, telemetry_client=TELEMETRY_CLIENT)
 

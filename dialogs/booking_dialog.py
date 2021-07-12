@@ -53,8 +53,9 @@ class BookingDialog(CancelAndHelpDialog):
         dateresolverdialog.telemetry_client = telemetry_client
         self.add_dialog(dateresolverdialog)
 
+        waterfall_dialog_name = "WaterfallDialog"
         waterfall_dialog = WaterfallDialog(
-                WaterfallDialog.__name__,
+                waterfall_dialog_name,
                 [
                     self.destination_step,
                     self.origin_step,
@@ -68,7 +69,7 @@ class BookingDialog(CancelAndHelpDialog):
         waterfall_dialog.telemetry_client = telemetry_client
         self.add_dialog(waterfall_dialog)
 
-        self.initial_dialog_id = WaterfallDialog.__name__
+        self.initial_dialog_id = waterfall_dialog_name
 
     async def destination_step(
         self, step_context: WaterfallStepContext

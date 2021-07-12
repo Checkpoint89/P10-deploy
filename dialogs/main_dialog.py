@@ -47,13 +47,13 @@ class MainDialog(ComponentDialog):
         self.add_dialog(booking_dialog)
 
         wf_dialog = WaterfallDialog(
-            "WFDialog",
+            "MainDialog_WFDialog",
             [self.intro_step, self.act_step, self.final_step]
         )
         wf_dialog.telemetry_client = self.telemetry_client
         self.add_dialog(wf_dialog)
 
-        self.initial_dialog_id = "WFDialog"
+        self.initial_dialog_id = "MainDialog_WFDialog"
         self.options = options
 
     async def intro_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
